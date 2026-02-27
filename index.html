@@ -740,7 +740,68 @@ function checkExecutionReady() {
 
 // Checkboxes par event listener lagao
 document.querySelectorAll(".flow").forEach(el => el.addEventListener("change", checkExecutionReady));
+(function startUltraRadar() {
+    function update() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const isDST = (month > 3 && month < 11);
+        const startH = isDST ? 19 : 20;
+        const startM = 30;
 
+        const config = [
+            { id: 'timerT1', card: 'cardT1', sOff: 0, eOff: 30, color: '#00d4ff', shadow: 'rgba(0, 212, 255, 0.5)' },
+            { id: 'timerT2', card: 'cardT2', sOff: 45, eOff: 60, color: '#bc13fe', shadow: 'rgba(188, 19, 254, 0.5)' }
+        ];
+
+        config.forEach(w => {
+            const timerEl = document.getElementById(w.id);
+            const cardEl = document.getElementById(w.card);
+
+            let sTime = new Date(); sTime.setHours(startH, startM + w.sOff, 0, 0);
+            let eTime = new Date(); eTime.setHours(startH, startM + w.eOff, 0, 0);
+
+            if (now >= sTime && now <= eTime && now.getDay() !== 0 && now.getDay() !== 6) {
+                // --- LIVE STATE (BRIGHT GREEN GLOW) ---
+                let left = Math.floor((eTime - now) / 1000);
+                timerEl.innerHTML = `<span style="color:#00ff41; text-shadow: 0 0 15px #00ff41;">● LIVE: ${Math.floor(left/60)}m ${left%60}s</span>`;
+                cardEl.style.borderColor = "#00ff41";
+                cardEl.style.boxShadow = "0 0 30px rgba(0, 255, 65, 0.6)";
+                cardEl.style.background = "rgba(0, 255, 65, 0.1)";
+            } 
+            else {
+                // --- COUNTDOWN / EXPIRED LOGIC ---
+                let target = new Date(sTime);
+                if (now > eTime || now.getDay() === 0 || now.getDay() === 6) {
+                    if (now > eTime) target.setDate(target.getDate() + 1);
+                    while (target.getDay() === 0 || target.getDay() === 6) target.setDate(target.getDate() + 1);
+                }
+
+                let diff = target - now;
+                let h = Math.floor(diff / 3600000);
+                let m = Math.floor((diff % 3600000) / 60000);
+                let s = Math.floor((diff % 60000) / 1000);
+
+                if (now > eTime && now.getDay() !== 0 && now.getDay() !== 6) {
+                    // --- EXPIRED (BLOOD RED) ---
+                    timerEl.style.color = "#ff5252";
+                    timerEl.textContent = `EXPIRED | ${h}h ${m}m`;
+                    cardEl.style.borderColor = "#ff5252";
+                    cardEl.style.boxShadow = "0 0 20px rgba(255, 82, 82, 0.3)";
+                    cardEl.style.background = "rgba(255, 82, 82, 0.05)";
+                } else {
+                    // --- WAITING (PRO NEON COLORS) ---
+                    timerEl.style.color = "#fff";
+                    timerEl.textContent = `${h}h ${m}m ${s}s`;
+                    cardEl.style.borderColor = w.color;
+                    cardEl.style.boxShadow = `0 0 20px ${w.shadow}`;
+                    cardEl.style.background = "#0a0a0a";
+                }
+            }
+        });
+    }
+    setInterval(update, 1000);
+    update();
+})();
     initDB();
 </script>
 </body>
