@@ -78,28 +78,52 @@
     </div>
 </div>
 
-    <div class="card">
-        <h2>1. Trading Control Panel</h2>
-        <div class="grid">
-            <div><label>Date</label><input type="date" id="tradeDate"></div>
-            <div><label>Trading Day</label>
-                <select id="daySelect" onchange="updateAccount()">
-                    <option value="">--Select--</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
-                </select>
-            </div>
-            <div><label>Trade Slot</label>
-                <select id="slotSelect" onchange="updateAccount()">
-                    <option value="">--Select--</option><option value="1">Trade 1</option><option value="2">Trade 2</option>
-                </select>
-            </div>
-            <div><label>Direct Account</label>
-                <select id="directAccount" onchange="updateAccount()">
-                    <option value="">--None--</option><option value="D">Account D</option><option value="E">Account E</option>
-                </select>
-            </div>
-        </div>
-        <div id="accountInfo" style="margin-top:10px; color:var(--gold); font-weight: bold;">Select options to calculate risk...</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; padding: 0 10px;">
+    
+    <div id="cardT1" style="background: #000; padding: 20px; border-radius: 12px; border-left: 5px solid #00d4ff; transition: 0.5s; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <div style="font-size: 0.75rem; color: #00d4ff; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">TRADE 1</div>
+        <div id="timerT1" style="font-size: 1.3rem; font-weight: bold; font-family: 'Courier New', monospace; color: #fff;">00h 00m 00s</div>
     </div>
+    
+    <div id="cardT2" style="background: #000; padding: 20px; border-radius: 12px; border-left: 5px solid #bc13fe; transition: 0.5s; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <div style="font-size: 0.75rem; color: #bc13fe; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">TRADE 2</div>
+        <div id="timerT2" style="font-size: 1.3rem; font-weight: bold; font-family: 'Courier New', monospace; color: #fff;">00h 00m 00s</div>
+    </div>
+    
+</div>
+
+    <div class="card">
+    <h2>1. Trading Control Panel</h2>
+    <div class="grid">
+        <div><label>Date</label><input type="date" id="tradeDate"></div>
+        <div><label>Asset</label>
+            <select id="assetSelect" onchange="updateAccount()">
+                <option value="XAUUSD">XAUUSD (Gold)</option>
+                <option value="EURUSD">EURUSD</option>
+                <option value="GBPUSD">GBPUSD</option>
+                <option value="BTCUSD">BTCUSD</option>
+            </select>
+        </div>
+        <div><label>Trading Day</label>
+            <select id="daySelect" onchange="updateAccount()">
+                <option value="">--Select--</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+            </select>
+        </div>
+        <div><label>Trade Slot</label>
+            <select id="slotSelect" onchange="updateAccount()">
+                <option value="">--Select--</option><option value="1">Trade 1</option><option value="2">Trade 2</option>
+            </select>
+        </div>
+        <div><label>Direct Account</label>
+            <select id="directAccount" onchange="updateAccount()">
+                <option value="">--None--</option><option value="D">Account D</option><option value="E">Account E</option>
+            </select>
+        </div>
+    </div>
+    <div id="accountInfo" style="margin-top:15px; padding:10px; background:#1a1a1a; border:1px solid var(--gold); border-radius:5px; color:var(--gold); font-weight: bold; line-height: 1.6;">
+        Select options to calculate risk...
+    </div>
+</div>
 
     <div class="card">
         <h2>2. Permission Matrix (Bias Engine)</h2>
@@ -148,7 +172,7 @@
                 <label class="check-item"><input type="checkbox" class="scale" value="Runner (30%)"> Runner (30%)</label>
             </div>
             <div class="grid">
-                <div><label>Asset</label><select id="assetSelect"><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>BTCUSD</option></select></div>
+                <div><label>Position</label><select id="assetSelect"><option>LONG</option><option>SHORT</option><option></option><option></option></select></div>
                 <div><label>Entry Price</label><input id="entryPrice" placeholder="0.0000"></div>
                 <div><label>Exit Price</label><input id="exitPrice" placeholder="0.0000"></div>
                 <div><label>Outcome</label><select id="outcome"><option>Target</option><option>Stop Loss</option><option>Break Even</option></select></div>
@@ -577,6 +601,145 @@ function updateChart() {
         db[t] = { bal: config[t], trades: 0, wins: 0, net: 0 };
         renderAll();
     }
+    (function startProfessionalInstitutionalRadar() {
+    function updateRadarSystem() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const day = now.getDay(); // 0: Sun, 6: Sat, 1: Mon
+        
+        // 1. DST LOGIC (March to Nov: 7:30 PM | Nov to March: 8:30 PM)
+        const isDST = (month > 3 && month < 11);
+        const startH = isDST ? 19 : 20;
+        const startM = 30;
+
+        const config = [
+            { id: 'timerT1', card: 'cardT1', sOff: 0, eOff: 30, color: '#00d4ff' },
+            { id: 'timerT2', card: 'cardT2', sOff: 45, eOff: 60, color: '#bc13fe' }
+        ];
+
+        config.forEach(w => {
+            const timerEl = document.getElementById(w.id);
+            const cardEl = document.getElementById(w.card);
+            if (!timerEl || !cardEl) return;
+
+            // Aaj ki expected window times
+            let sTime = new Date(); sTime.setHours(startH, startM + w.sOff, 0, 0);
+            let eTime = new Date(); eTime.setHours(startH, startM + w.eOff, 0, 0);
+
+            // 2. LOGIC: Check if we are LIVE right now
+            // Weekend par Live nahi ho sakta
+            const isWeekend = (day === 0 || day === 6);
+            
+            if (!isWeekend && now >= sTime && now <= eTime) {
+                // --- LIVE STATE ---
+                let left = Math.floor((eTime - now) / 1000);
+                let mins = Math.floor(left / 60);
+                let secs = left % 60;
+                timerEl.innerHTML = `<span style="color:#00ff41">● LIVE: ${mins}m ${secs}s</span>`;
+                cardEl.style.borderColor = "#00ff41";
+                cardEl.style.boxShadow = "0 0 20px rgba(0, 255, 65, 0.4)";
+                cardEl.style.background = "rgba(0, 255, 65, 0.05)";
+            } 
+            else {
+                // --- COUNTDOWN / EXPIRED LOGIC ---
+                let target = new Date(sTime);
+
+                // Agar aaj ka time nikal gaya hai YA aaj weekend hai, toh next valid day dhundo
+                if (now > eTime || isWeekend) {
+                    // Agle din se check shuru karo agar aaj ka session khatam
+                    if (now > eTime) target.setDate(target.getDate() + 1);
+                    
+                    // Jab tak Saturday ya Sunday mile, skip karke agla din check karo (Monday tak)
+                    while (target.getDay() === 0 || target.getDay() === 6) {
+                        target.setDate(target.getDate() + 1);
+                    }
+                }
+
+                let diff = target - now;
+                let h = Math.floor(diff / 3600000);
+                let m = Math.floor((diff % 3600000) / 60000);
+                let s = Math.floor((diff % 60000) / 1000);
+
+                // UI Update based on State
+                if (now > eTime && !isWeekend) {
+                    // Aaj ka session khatam (RED)
+                    timerEl.innerHTML = `<span style="color:#ff5252">EXPIRED | Next in ${h}h ${m}m</span>`;
+                    cardEl.style.borderColor = "#ff5252";
+                    cardEl.style.background = "#000";
+                    cardEl.style.boxShadow = "none";
+                } else {
+                    // Waiting for Next (Original Colors)
+                    timerEl.style.color = "#fff";
+                    timerEl.textContent = `${h}h ${m}m ${s}s`;
+                    cardEl.style.borderColor = w.color;
+                    cardEl.style.background = "#000";
+                    cardEl.style.boxShadow = "0 4px 15px rgba(0,0,0,0.5)";
+                }
+            }
+        });
+    }
+
+    // Har 1 second mein update karo
+    setInterval(updateRadarSystem, 1000);
+    updateRadarSystem();
+})();
+
+// 3. QUANTITY CALCULATION & AUTHORIZE BUTTON FIX
+function updateAccount() {
+    let asset = document.getElementById("assetSelect").value;
+    let daySelect = document.getElementById("daySelect").value;
+    let slotSelect = document.getElementById("slotSelect").value;
+    let direct = document.getElementById("directAccount").value;
+    
+    // Account Selection Logic
+    if(direct) currentAcc = direct;
+    else if(daySelect && slotSelect) {
+        const map = { 
+            Monday:["A","C"], Tuesday:["B","A"], Wednesday:["C","B"], 
+            Thursday:["A","B"], Friday:["B","C"] 
+        };
+        currentAcc = map[daySelect][slotSelect-1];
+    }
+
+    if(currentAcc) {
+        let rAmt = db[currentAcc].bal * risks[currentAcc]; 
+        let qtyBox = document.getElementById("riskQty");
+
+        if(asset === "XAUUSD") {
+            // Gold Logic: $35 risk / $2.5 to $7 range
+            let minLot = ((rAmt / 7) * 0.01).toFixed(2);
+            let maxLot = ((rAmt / 2.5) * 0.01).toFixed(2);
+            
+            // Input box mein range fill karo
+            qtyBox.value = `${minLot} - ${maxLot}`;
+            
+            document.getElementById("accountInfo").innerHTML = `
+                <div style="display:flex; justify-content:space-between; color:var(--gold);">
+                    <span>ACC: ${currentAcc}</span>
+                    <span>RISK: $${rAmt.toFixed(2)}</span>
+                </div>
+                <div style="margin-top:5px; font-size:0.8rem; color:#fff;">
+                    Suggested: ${minLot} to ${maxLot} Lots
+                </div>
+            `;
+        }
+    }
+    checkExecutionReady(); // Button status refresh karo
+}
+
+// 4. AUTHORIZE BUTTON UNLOCK LOGIC
+function checkExecutionReady() {
+    const checks = Array.from(document.querySelectorAll(".flow"));
+    const allChecked = checks.every(i => i.checked);
+    const hasQty = document.getElementById("riskQty").value !== "";
+    const btn = document.getElementById("executeBtn");
+    
+    // Agar sab tick hai aur qty hai, toh button enable (Currently bypass session lock for demo)
+    btn.disabled = !(allChecked && hasQty);
+}
+
+// Checkboxes par event listener lagao
+document.querySelectorAll(".flow").forEach(el => el.addEventListener("change", checkExecutionReady));
 
     initDB();
 </script>
