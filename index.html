@@ -38,6 +38,49 @@
         .vio-tag { background: #311b1b; color: #ff5252; padding: 4px 8px; border-radius: 4px; border: 1px solid #d32f2f; margin: 2px; font-size: 0.7rem; display: inline-block; }
         .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); overflow-y: auto; }
         .modal-content { background: #111; margin: 2% auto; padding: 30px; border: 1px solid var(--gold); width: 85%; border-radius: 10px; position: relative; }
+        /* EXECUTION FLOW - TRADE 2 REPLICA DESIGN */
+.exec-card-locked {
+    background: #000 !important;
+    border: 1px solid #333 !important;
+    border-left: 4px solid #ff5252 !important; /* Side border like Trade 2 */
+    box-shadow: 0 4px 15px rgba(255, 82, 82, 0.1) !important;
+}
+
+.exec-card-ready {
+    background: #000 !important;
+    border: 1px solid #00ff41 !important;
+    border-left: 4px solid #00ff41 !important;
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.2) !important;
+}
+
+.binary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Ek line mein do item */
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.bin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0a0a0a;
+    padding: 10px;
+    border: 1px solid #1a1a1a;
+    border-radius: 5px;
+}
+
+.bin-text { font-size: 0.75rem; color: #c5a059; font-weight: bold; }
+
+.t-btn {
+    width: 32px; height: 26px; border: 1px solid #333;
+    background: #111; cursor: pointer; font-size: 0.7rem; border-radius: 3px;
+    font-weight: bold;
+}
+.t-btn.g-off { color: #00ff41; }
+.t-btn.r-off { color: #ff5252; }
+.t-btn.g-on { background: #00ff41 !important; color: #000 !important; box-shadow: 0 0 10px #00ff41; border: none; }
+.t-btn.r-on { background: #ff5252 !important; color: #fff !important; box-shadow: 0 0 10px #ff5252; border: none; }
     </style>
 </head>
 <body>
@@ -138,30 +181,33 @@
         <div id="biasDisplay" style="padding:15px; text-align:center; margin-top:10px; font-weight:bold; border: 1px solid #222;">NEUTRAL BIAS</div>
     </div>
 
-    <div class="card" id="flowCard">
-        <h2>3. Institutional Execution Flow</h2>
-        <div class="grid">
-            <label class="check-item"><input type="checkbox" class="flow"> Sleep (7h+)</label>
-            <label class="check-item"><input type="checkbox" class="flow"> No Revenge/Fear</label>
-            <label class="check-item"><input type="checkbox" class="flow"> Desk Ready</label>
-            <label class="check-item"><input type="checkbox" class="flow"> HTF Location</label>
-            <label class="check-item"><input type="checkbox" class="flow"> Single Side</label>
-            <label class="check-item"><input type="checkbox" class="flow"> No Mid-Range</label>
-            <label class="check-item"><input type="checkbox" class="flow"> Clear Range</label>
-            <label class="check-item"><input type="checkbox" class="flow"> LTF Confirm</label>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <label class="check-item" style="border:none; padding:0; width:60%;"><input type="checkbox" class="flow" id="riskCheck"> Risk Locked</label>
-                <input type="number" id="riskQty" placeholder="Qty" style="width:40%; padding:5px; font-size:0.7rem;">
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <label style="font-size:0.8rem;">Liquidity:</label>
-                <select id="liqType" style="padding:5px; font-size:0.7rem;">
-                    <option value="None">None</option><option value="Minor">Minor</option><option value="Major">Major</option>
-                </select>
-            </div>
+   <div class="card exec-card-locked" id="flowCard">
+    <h2 id="flowTitle" style="color:#ff5252; font-size: 1.1rem; letter-spacing: 1px;">3. Institutional Execution Flow</h2>
+    
+    <div id="binaryChecklist" class="binary-grid"></div>
+
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid #222; padding-top: 15px;">
+        <div style="background:#000; padding:10px; border:1px solid #333; border-radius:5px;">
+            <label style="font-size:0.65rem; color:#c5a059; display:block; margin-bottom:5px;">RISK QTY (MANDATORY)</label>
+            <input type="text" id="riskQty" oninput="updateFlowStatus()" placeholder="Lots..." 
+                   style="background:transparent; border:none; border-bottom:1px solid #444; color:#fff; width:90%; outline:none;">
         </div>
-        <button id="executeBtn" disabled onclick="revealSections()" style="margin-top:20px; background:var(--gold); color:#000;">AUTHORIZE ENTRY</button>
+        <div style="background:#000; padding:10px; border:1px solid #333; border-radius:5px;">
+            <label style="font-size:0.65rem; color:#c5a059; display:block; margin-bottom:5px;">LIQUIDITY (MANDATORY)</label>
+            <select id="liqType" onchange="updateFlowStatus()" 
+                    style="background:transparent; border:none; color:#fff; width:100%; outline:none; cursor:pointer;">
+                <option value="">Select...</option>
+                <option value="Minor">Minor Liquidity</option>
+                <option value="Major">Major Liquidity</option>
+            </select>
+        </div>
     </div>
+    
+    <button id="executeBtn" disabled onclick="revealSections()" 
+        style="margin-top:20px; background:#1a1a1a; color:#444; border:1px solid #333; height:50px; width:100%; font-weight:900; letter-spacing:2px; transition: 0.3s;">
+        AUTHORIZE ENTRY (LOCKED)
+    </button>
+</div>
 
     <div id="postTradeSections">
         <div class="card">
@@ -556,7 +602,8 @@ function updateChart() {
         if (t.image) {
             doc.addPage(); // Add a new page for the image
             doc.text("TRADE SCREENSHOT", 14, 15);
-            doc.addImage(t.image, 'JPEG', 15, 20, 180, 135); // Add base64 image
+            const format = t.image.includes('png') ? 'PNG' : 'JPEG';
+        doc.addImage(t.image, format, 15, 20, 180, 135); // Add base64 image
         }
         
         doc.save(`Trade_${t.date}_${t.acc}.pdf`);
@@ -802,6 +849,69 @@ document.querySelectorAll(".flow").forEach(el => el.addEventListener("change", c
     setInterval(update, 1000);
     update();
 })();
+// Global states for checklist
+const flowKeys = ["Sleep", "No Revenge", "Desk Ready", "HTF Location", "Single Side", "No Mid-Range", "Clear Range", "LTF Confirm"];
+let flowMemory = {}; 
+
+function initFlowUI() {
+    const container = document.getElementById("binaryChecklist");
+    if(!container) return;
+    container.innerHTML = "";
+    flowKeys.forEach(key => {
+        const div = document.createElement("div");
+        div.className = "bin-item";
+        div.innerHTML = `
+            <span class="bin-text">${key}</span>
+            <div style="display:flex; gap:5px;">
+                <button type="button" class="t-btn g-off ${flowMemory[key]==='G'?'g-on':''}" onclick="setFlowState('${key}','G')">G</button>
+                <button type="button" class="t-btn r-off ${flowMemory[key]==='R'?'r-on':''}" onclick="setFlowState('${key}','R')">R</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function setFlowState(key, val) {
+    flowMemory[key] = val;
+    initFlowUI();
+    updateFlowStatus();
+}
+
+function updateFlowStatus() {
+    const greens = Object.values(flowMemory).filter(v => v === 'G').length;
+    const qty = document.getElementById("riskQty").value.trim();
+    const liq = document.getElementById("liqType").value;
+    
+    const card = document.getElementById("flowCard");
+    const title = document.getElementById("flowTitle");
+    const btn = document.getElementById("executeBtn");
+
+    // Condition: Risk aur Liquidity bharna hi padega
+    const isMandatoryDone = (qty !== "" && liq !== "");
+
+    if (greens >= 7 && isMandatoryDone) {
+        // --- GREEN STATUS (TRADE 2 STYLE) ---
+        card.className = "card exec-card-ready";
+        title.style.color = "#00ff41";
+        btn.disabled = false;
+        btn.style.background = "#00ff41";
+        btn.style.color = "#000";
+        btn.innerText = "AUTHORIZE ENTRY (READY)";
+        btn.style.cursor = "pointer";
+    } else {
+        // --- RED/DEFAULT STATUS ---
+        card.className = "card exec-card-locked";
+        title.style.color = "#ff5252";
+        btn.disabled = true;
+        btn.style.background = "#1a1a1a";
+        btn.style.color = "#444";
+        btn.innerText = isMandatoryDone ? `LOCKED (${greens}/7 GREEN)` : "LOCKED (FILL MANDATORY)";
+        btn.style.cursor = "not-allowed";
+    }
+}
+
+// Initial Call
+initFlowUI();
     initDB();
 </script>
 </body>
