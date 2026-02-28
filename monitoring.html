@@ -3,140 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Institutional Analytics - Ravi</title>
+    <title>Institutional Analytics - Monitoring Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { --bg: #050505; --card: #0d0d0d; --text: #e0e0e0; --gold: #c5a059; --accent: #00c805; --danger: #ff3b3b; --border: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         
-        /* Header & Navigation */
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; }
-        .btn-back { background: var(--gold); color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem; transition: 0.3s; text-transform: uppercase; }
+        .btn-back { background: var(--gold); color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
         
-        /* Filters Section */
-        .filters { display: flex; gap: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; align-items: center; }
+        .filters { display: flex; gap: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; }
         .filter-group { flex: 1; }
-        label { display: block; font-size: 0.7rem; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
-        select { background: #151515; color: #fff; border: 1px solid #252525; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
-        select:focus { border-color: var(--gold); outline: none; }
+        label { display: block; font-size: 0.7rem; color: #666; margin-bottom: 8px; text-transform: uppercase; }
+        select { background: #151515; color: #fff; border: 1px solid #252525; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; }
 
-        /* Stats Bar */
         .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-box { background: var(--card); padding: 20px; border: 1px solid var(--border); border-radius: 12px; text-align: center; border-bottom: 3px solid transparent; }
-        .stat-box:hover { border-bottom-color: var(--gold); }
-        .stat-label { font-size: 0.7rem; color: #666; text-transform: uppercase; margin-bottom: 10px; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--gold); font-family: 'Courier New', monospace; }
+        .stat-box { background: var(--card); padding: 20px; border: 1px solid var(--border); border-radius: 12px; text-align: center; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--gold); }
 
-        /* DYNAMIC CALENDAR AREA */
-        #calendarArea { display: grid; gap: 25px; transition: all 0.5s ease; }
-        
-        /* Layout Variations based on Range */
-        .view-current { grid-template-columns: 1fr; max-width: 900px; margin: 0 auto; } /* Bada Size */
-        .view-3months { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); } /* Medium Size */
-        .view-6months { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); } /* Chota Size */
-        .view-year { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } /* Ekdum Chota */
+        /* Recent Sessions Styling */
+        .recent-container { margin-bottom: 30px; }
+        .recent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .recent-card { background: #111; border: 1px solid #222; border-left: 4px solid var(--gold); padding: 15px; border-radius: 8px; }
+        .recent-lesson { font-style: italic; color: #aaa; font-size: 0.8rem; margin-top: 10px; border-top: 1px solid #222; padding-top: 8px; }
 
-        .month-box { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); position: relative; }
-        .month-name { color: var(--gold); font-weight: bold; margin-bottom: 20px; text-align: left; font-size: 1.1rem; border-left: 3px solid var(--gold); padding-left: 10px; text-transform: uppercase; }
+        .month-box { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 25px; }
+        .month-name { color: var(--gold); font-weight: bold; margin-bottom: 20px; border-left: 3px solid var(--gold); padding-left: 10px; }
         
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-head { text-align: center; font-size: 0.7rem; color: #444; font-weight: bold; padding-bottom: 10px; }
-        .day { aspect-ratio: 1/1; background: #080808; border: 1px solid #151515; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: 0.2s; }
-        .day:hover { transform: scale(1.05); z-index: 10; border-color: #333; }
-        
-        /* Coloring Logic */
+        .day { aspect-ratio: 1/1; background: #080808; border: 1px solid #151515; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.2s; }
         .green-day { background: rgba(0, 200, 5, 0.1) !important; border-color: var(--accent) !important; }
         .red-day { background: rgba(255, 59, 59, 0.1) !important; border-color: var(--danger) !important; }
-        
-        .d-num { font-size: 0.7rem; color: #333; position: absolute; top: 5px; left: 7px; }
-        .view-current .d-pl { font-size: 1rem; } /* Bada font for current month */
-        .view-year .d-pl { font-size: 0.7rem; } /* Chota font for yearly */
-        .d-pl { font-weight: bold; }
-        .d-count { font-size: 0.6rem; color: #555; position: absolute; bottom: 5px; right: 7px; }
+        .d-num { font-size: 0.7rem; color: #444; position: absolute; top: 5px; left: 7px; }
 
-        @media (max-width: 768px) { .stats-bar { grid-template-columns: repeat(2, 1fr); } }
+        /* Modal Updates */
+        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
+        .modal-content { background: #0a0a0a; margin: 2% auto; padding: 30px; border: 1px solid var(--gold); width: 90%; max-width: 900px; border-radius: 12px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .info-pane { background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; }
+        .tag { display: inline-block; background: #222; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; margin: 2px; border: 1px solid #333; }
+        .tag.red { color: #ff5252; border-color: #ff5252; }
+        .tag.green { color: #00ff41; border-color: #00ff41; }
+        .screenshot-img { width: 100%; border-radius: 8px; margin-top: 15px; border: 2px solid #222; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="letter-spacing: 3px; font-weight: 900; color: #fff;">ROBOTIC <span style="color:var(--gold)">MONITORING</span></div>
-    <a href="index.html" class="btn-back">Terminal 1.0</a>
+    <div style="letter-spacing: 3px; font-weight: 900; color: #fff;">INSTITUTIONAL <span style="color:var(--gold)">MONITORING</span></div>
+    <a href="index.html" class="btn-back">← Back to Terminal</a>
+</div>
+
+<div class="recent-container">
+    <h2 style="font-size: 0.9rem; color: var(--gold); text-transform: uppercase; margin-bottom: 15px;">Recent 4 Sessions Recap</h2>
+    <div id="recentSessions" class="recent-grid"></div>
 </div>
 
 <div class="filters">
-    <div class="filter-group">
-        <label>Data Horizon</label>
-        <select id="timeRange" onchange="loadData()">
-            <option value="current">Current Month (Full Focus)</option>
-            <option value="3months">Last Quarter (3 Months)</option>
-            <option value="6months">Mid-Year (6 Months)</option>
-            <option value="1year">Annual View (12 Months)</option>
-            <option value="2026">Historical: 2026</option>
-            <option value="2025">Historical: 2025</option>
-        </select>
-    </div>
-    <div class="filter-group">
-        <label>Account Portfolio</label>
-        <select id="accFilter" onchange="loadData()">
-            <option value="ALL">Consolidated (All Accounts)</option>
-            <option value="A">Account Alpha (A)</option>
-            <option value="B">Account Beta (B)</option>
-            <option value="C">Account Gamma (C)</option>
-            <option value="D">Account Delta (D)</option>
-            <option value="E">Account Sigma (E)</option>
-        </select>
-    </div>
+    <div class="filter-group"><label>Timeline</label><select id="timeRange" onchange="loadData()"><option value="current">Current Month</option><option value="3months">Last Quarter</option></select></div>
+    <div class="filter-group"><label>Account Filter</label><select id="accFilter" onchange="loadData()"><option value="ALL">All Portfolio</option><option value="A">Acc A</option><option value="B">Acc B</option><option value="C">Acc C</option><option value="D">Acc D</option><option value="E">Acc E</option></select></div>
 </div>
 
 <div class="stats-bar">
-    <div class="stat-box"><div class="stat-label">Total Performance</div><div id="pnl" class="stat-val">$0.00</div></div>
-    <div class="stat-box"><div class="stat-label">Execution Count</div><div id="trades" class="stat-val">0</div></div>
-    <div class="stat-box"><div class="stat-label">Precision Rate</div><div id="wr" class="stat-val">0%</div></div>
-    <div class="stat-box"><div class="stat-label">Green Sessions</div><div id="gDays" class="stat-val">0</div></div>
+    <div class="stat-box"><div style="font-size:0.7rem; color:#666;">TOTAL P/L</div><div id="pnl" class="stat-val">$0.00</div></div>
+    <div class="stat-box"><div style="font-size:0.7rem; color:#666;">EXECUTIONS</div><div id="trades" class="stat-val">0</div></div>
+    <div class="stat-box"><div style="font-size:0.7rem; color:#666;">WIN RATE</div><div id="wr" class="stat-val">0%</div></div>
+    <div class="stat-box"><div style="font-size:0.7rem; color:#666;">GREEN DAYS</div><div id="gDays" class="stat-val">0</div></div>
 </div>
 
 <div id="calendarArea"></div>
 
+<div id="tradeModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 id="modalTitle" style="color:var(--gold); margin:0;">Session Deep-Dive</h2>
+            <button onclick="closeModal()" style="background:var(--danger); border:none; color:#fff; padding:8px 16px; cursor:pointer; font-weight:bold;">CLOSE</button>
+        </div>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
 <script>
+    // Database sync with index.html
     const history = JSON.parse(localStorage.getItem("aaravHist_v16")) || [];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    function init() {
+        renderRecentFour();
+        loadData();
+    }
+
+    // 2. RENDER RECENT 4 TRADES ON HOME PAGE
+    function renderRecentFour() {
+        const container = document.getElementById("recentSessions");
+        const recent = history.slice(-4).reverse();
+        container.innerHTML = recent.map(t => `
+            <div class="recent-card">
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>${t.date} | ${t.acc}</span>
+                    <span style="color:${t.pl >= 0 ? 'var(--accent)' : 'var(--danger)'}">$${t.pl.toFixed(2)}</span>
+                </div>
+                <div style="font-size:0.75rem; margin-top:5px; color:var(--gold)">Asset: ${t.asset} | Outcome: ${t.type}</div>
+                <div style="margin-top:8px;">
+                    ${t.vios && t.vios.length > 0 ? t.vios.map(v => `<span class="tag red">${v}</span>`).join("") : '<span class="tag" style="color:#00ff41">No Violations</span>'}
+                </div>
+                <div class="recent-lesson"><b>Lesson:</b> ${t.psy[5] || 'No lesson recorded.'}</div>
+            </div>
+        `).join("");
+    }
 
     function loadData() {
         const range = document.getElementById("timeRange").value;
         const acc = document.getElementById("accFilter").value;
         const container = document.getElementById("calendarArea");
-        
-        // Dynamic Class Styling
-        container.className = ""; // Reset
-        if(range === 'current') container.classList.add('view-current');
-        else if(range === '3months') container.classList.add('view-3months');
-        else if(range === '6months') container.classList.add('view-6months');
-        else container.classList.add('view-year');
-
         container.innerHTML = "";
 
         let now = new Date();
         let displayMonths = [];
+        if (range === "current") displayMonths.push({ m: now.getMonth(), y: now.getFullYear() });
+        else { for(let i=2; i>=0; i--) { let d = new Date(now.getFullYear(), now.getMonth()-i, 1); displayMonths.push({m: d.getMonth(), y: d.getFullYear()}); } }
 
-        if (range === "current") {
-            displayMonths.push({ m: now.getMonth(), y: now.getFullYear() });
-        } else if (range === "3months" || range === "6months" || range === "1year") {
-            let count = range === "3months" ? 3 : (range === "6months" ? 6 : 12);
-            for(let i = count-1; i >= 0; i--) {
-                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                displayMonths.push({ m: d.getMonth(), y: d.getFullYear() });
-            }
-        } else {
-            for(let i=0; i<12; i++) displayMonths.push({ m: i, y: parseInt(range) });
-        }
-
-        renderDisplay(displayMonths, acc);
+        renderCalendar(displayMonths, acc);
     }
 
-    function renderDisplay(monthsToRender, accFilter) {
+    function renderCalendar(months, accFilter) {
         let tPL = 0, tTrades = 0, tWins = 0, tGreenDays = 0;
-
-        monthsToRender.forEach(obj => {
+        
+        months.forEach(obj => {
             const m = obj.m, y = obj.y;
             const monthDiv = document.createElement("div");
             monthDiv.className = "month-box";
@@ -144,11 +138,10 @@
             
             const grid = document.createElement("div");
             grid.className = "cal-grid";
-            ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(day => grid.innerHTML += `<div class="day-head">${day}</div>`);
-
+            ["S","M","T","W","T","F","S"].forEach(d => grid.innerHTML += `<div style="text-align:center; font-size:0.7rem; color:#444;">${d}</div>`);
+            
             const firstDay = new Date(y, m, 1).getDay();
             const daysInMonth = new Date(y, m + 1, 0).getDate();
-
             for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
 
             for(let d=1; d<=daysInMonth; d++) {
@@ -156,22 +149,16 @@
                 const dayTrades = history.filter(t => t.date === dateStr && (accFilter === "ALL" || t.acc === accFilter));
                 const dayPL = dayTrades.reduce((s, t) => s + t.pl, 0);
                 
-                let cls = "";
-                if(dayTrades.length > 0) {
-                    if(dayPL > 0) { cls = "green-day"; tGreenDays++; }
-                    else if(dayPL < 0) { cls = "red-day"; }
-                    tPL += dayPL;
-                    tTrades += dayTrades.length;
-                    tWins += dayTrades.filter(t => t.type === 'Target').length;
-                }
+                let cls = dayTrades.length > 0 ? (dayPL >= 0 ? "green-day" : "red-day") : "";
+                if(dayPL > 0) tGreenDays++;
+                tPL += dayPL; tTrades += dayTrades.length;
+                tWins += dayTrades.filter(t => t.type === 'Target').length;
 
-                grid.innerHTML += `
-                    <div class="day ${cls}">
-                        <span class="d-num">${d}</span>
-                        <span class="d-pl" style="color:${dayPL > 0 ? 'var(--accent)' : (dayPL < 0 ? 'var(--danger)' : '#333')}">${dayPL !== 0 ? '$' + Math.abs(dayPL).toFixed(0) : ''}</span>
-                        ${dayTrades.length > 0 ? `<span class="d-count">${dayTrades.length}T</span>` : ''}
-                    </div>
-                `;
+                const dayEl = document.createElement("div");
+                dayEl.className = `day ${cls}`;
+                dayEl.innerHTML = `<span class="d-num">${d}</span><span style="font-weight:bold; font-size:0.8rem; color:${dayPL>=0?'#00ff41':'#ff3131'}">${dayPL ? '$'+Math.abs(dayPL).toFixed(0) : ''}</span>`;
+                dayEl.onclick = () => openDayTrades(dateStr, dayTrades);
+                grid.appendChild(dayEl);
             }
             monthDiv.appendChild(grid);
             document.getElementById("calendarArea").appendChild(monthDiv);
@@ -182,7 +169,95 @@
         document.getElementById("wr").innerText = tTrades ? ((tWins/tTrades)*100).toFixed(1) + "%" : "0%";
         document.getElementById("gDays").innerText = tGreenDays;
     }
-    loadData();
+
+    function openDayTrades(date, trades) {
+        if(trades.length === 0) return;
+        const body = document.getElementById("modalBody");
+        document.getElementById("modalTitle").innerText = `Logs for ${date}`;
+        body.innerHTML = trades.map((t) => `
+            <div style="background:#111; padding:15px; margin-top:10px; border-radius:8px; border-left:4px solid var(--gold); cursor:pointer;" onclick="viewDeepDive(${history.indexOf(t)})">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div><b>${t.asset} | Account ${t.acc}</b><br><small style="color:#666;">Grade: ${t.grade}</small></div>
+                    <div style="color:${t.pl>=0?'#00ff41':'#ff3131'}; font-weight:bold;">$${t.pl.toFixed(2)}</div>
+                </div>
+            </div>
+        `).join("");
+        document.getElementById("tradeModal").style.display = "block";
+    }
+
+    // 3. UPDATED DEEP DIVE: Saara data (Checklist, Bias, Vios) dikhayega
+    function viewDeepDive(idx) {
+        const t = history[idx];
+        const body = document.getElementById("modalBody");
+        
+        // Checklist items reconstruction (since we don't save raw keys, we show generic or saved ones)
+        const viosHtml = t.vios.length > 0 ? t.vios.map(v => `<span class="tag red">${v}</span>`).join("") : '<span class="tag green">Clean Session</span>';
+        const scalesHtml = t.scale.map(s => `<span class="tag green">${s}</span>`).join("");
+
+        body.innerHTML = `
+            <button onclick="loadData();" style="background:#222; color:#fff; border:none; padding:8px 15px; margin:15px 0; cursor:pointer; border-radius:4px;">← Back</button>
+            
+            <div class="detail-grid">
+                <div class="info-pane">
+                    <h3 style="color:var(--gold); margin-top:0; font-size:0.9rem;">1. EXECUTION CONTEXT</h3>
+                    <p><b>Entry:</b> ${t.entry} | <b>Exit:</b> ${t.exit}</p>
+                    <p><b>Outcome:</b> ${t.type} (${t.grade})</p>
+                    <p><b>Institutional Bias:</b> <span class="tag" style="background:#222">${t.bias || 'Applied'}</span></p>
+                    <p><b>Risk Management:</b> $${t.pl.toFixed(2)} realized</p>
+                </div>
+                
+                <div class="info-pane">
+                    <h3 style="color:var(--gold); margin-top:0; font-size:0.9rem;">2. SYSTEM HEALTH</h3>
+                    <div><b>Violations:</b><br>${viosHtml}</div>
+                    <div style="margin-top:10px;"><b>Scales Booked:</b><br>${scalesHtml}</div>
+                </div>
+            </div>
+
+            <div class="info-pane" style="margin-top:20px;">
+                <h3 style="color:var(--gold); margin-top:0; font-size:0.9rem;">3. PSYCHOLOGY & LESSONS</h3>
+                <div style="font-size:0.85rem; line-height:1.6;">
+                    <p><b>Setup Quality:</b> ${t.psy[1]}</p>
+                    <p><b>Self-Control:</b> ${t.psy[0]}</p>
+                    <p style="background:#000; padding:10px; border-left:3px solid var(--accent);"><b>Master Lesson:</b> ${t.psy[5]}</p>
+                </div>
+            </div>
+
+            ${t.image ? `<img src="${t.image}" class="screenshot-img">` : '<div style="padding:20px; text-align:center; color:#444;">No Screenshot Found</div>'}
+            
+            <button onclick="downloadTradePDF(${idx})" style="width:100%; background:var(--gold); color:#000; padding:15px; font-weight:bold; margin-top:20px; border:none; border-radius:8px; cursor:pointer;">DOWNLOAD PDF REPORT</button>
+        `;
+    }
+
+    function downloadTradePDF(idx) {
+        const t = history[idx];
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(10, 10, 10); doc.rect(0, 0, 210, 297, 'F');
+        doc.setTextColor(197, 160, 89); doc.setFontSize(20); doc.text("INSTITUTIONAL TRADE REPORT", 14, 20);
+        
+        const rows = [
+            ["Date", t.date], ["Account", t.acc], ["Asset", t.asset], ["Outcome", t.type],
+            ["Net P/L", `$${t.pl.toFixed(2)}`], ["Grade", t.grade], 
+            ["Violations", t.vios.join(", ") || "None"],
+            ["Scales", t.scale.join(", ")],
+            ["Primary Lesson", t.psy[5]]
+        ];
+        doc.autoTable({ startY: 30, body: rows, theme: 'grid', styles: { fontSize: 10 } });
+        
+        if (t.image) { 
+            doc.addPage(); 
+            doc.setTextColor(197, 160, 89);
+            doc.text("EXECUTION PROOF", 14, 15); 
+            doc.addImage(t.image, 'JPEG', 10, 20, 190, 130); 
+        }
+        doc.save(`Journal_${t.date}_${t.acc}.pdf`);
+    }
+
+    function closeModal() { document.getElementById("tradeModal").style.display = "none"; }
+    window.onclick = (e) => { if(e.target.className === 'modal') closeModal(); }
+    
+    // Auto-start
+    init();
 </script>
 </body>
 </html>
