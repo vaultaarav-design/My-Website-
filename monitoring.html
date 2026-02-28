@@ -64,6 +64,15 @@
     <div class="filter-group"><label>Timeline</label><select id="timeRange" onchange="loadData()"><option value="current">Current Month</option><option value="3months">Last Quarter</option></select></div>
     <div class="filter-group"><label>Account Filter</label><select id="accFilter" onchange="loadData()"><option value="ALL">All Portfolio</option><option value="A">Acc A</option><option value="B">Acc B</option><option value="C">Acc C</option><option value="D">Acc D</option><option value="E">Acc E</option></select></div>
 </div>
+<div style="margin: 20px 0; padding: 15px; background: #1a150a; border: 1px solid var(--gold); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h4 style="margin:0; color: var(--gold); font-size: 0.8rem;">STORAGE OPTIMIZER</h4>
+        <p style="margin:0; font-size: 0.7rem; color: #aaa;">GitHub pe push karne se pehle screenshots uda dein taaki file size chhota rahe.</p>
+    </div>
+    <button onclick="purgeScreenshotsOnly()" style="background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 0.7rem;">
+        ⚡ DELETE ALL SCREENSHOTS
+    </button>
+</div>
 
 <div class="stats-bar">
     <div class="stat-box"><div style="font-size:0.7rem; color:#666;">TOTAL P/L</div><div id="pnl" class="stat-val">$0.00</div></div>
@@ -257,6 +266,31 @@
     window.onclick = (e) => { if(e.target.className === 'modal') closeModal(); }
     
     // Auto-start
+    // Sirf Screenshots ko udaane wala function
+function purgeScreenshotsOnly() {
+    // 1. Pehle confirm karlo
+    const confirmation = confirm("Bhai, kya aap sabhi trades se SCREENSHOTS hatana chahte hain? \n\n(Aapka P/L, Date aur Lessons wala data SAFE rahega, sirf file halki ho jayegi).");
+
+    if (confirmation) {
+        let count = 0;
+        
+        // 2. History loop karke sirf image property ko null kar rahe hain
+        history.forEach(trade => {
+            if (trade.image) {
+                trade.image = null; // Screenshot delete
+                count++;
+            }
+        });
+
+        // 3. LocalStorage mein updated (halka) data save karein
+        localStorage.setItem("aaravHist_v16", JSON.stringify(history));
+
+        alert(`Success! ${count} trades se screenshots hata diye gaye hain. Ab aapka data GitHub ke liye bilkul halka hai.`);
+        
+        // 4. Page refresh taaki changes dikhein
+        location.reload();
+    }
+}
     init();
 </script>
 </body>
