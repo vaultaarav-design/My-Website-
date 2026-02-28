@@ -914,8 +914,190 @@ function updateFlowStatus() {
 initFlowUI();
     initDB();
 </script>
+
+<!-- ===== MASTER VIEW + COMPLETE PDF INTEGRATION (UI UNCHANGED) ===== -->
+<script>
+(function(){
+
+function waitForTradeObject(callback){
+    let check = setInterval(()=>{
+        if(typeof history !== "undefined" && history.length > 0){
+            clearInterval(check);
+            callback(history[history.length-1]);
+        }
+    },300);
+}
+
+function buildMasterDownloadButton(tradeData){
+
+    if(document.getElementById("masterDownloadBtn")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "masterDownloadBtn";
+    btn.innerText = "DOWNLOAD COMPLETE MASTER SESSION PDF";
+    btn.style.marginTop = "40px";
+    btn.style.padding = "15px";
+    btn.style.fontWeight = "bold";
+    btn.style.background = "gold";
+    btn.style.color = "#000";
+    btn.style.width = "100%";
+    btn.onclick = function(){
+        generateMasterPDF(tradeData);
+    };
+
+    document.body.appendChild(btn);
+}
+
+window.generateMasterPDF = function(t){
+
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("INSTITUTIONAL MASTER SESSION REPORT",20,20);
+
+    doc.setFontSize(10);
+    let y = 35;
+
+    function addLine(text){
+        doc.text(text,20,y);
+        y+=7;
+        if(y>270){ doc.addPage(); y=20; }
+    }
+
+    addLine("Trading Control Panel");
+    addLine("----------------------");
+
+    for(let key in t){
+        if(key !== "htf" && key !== "ltf"){
+            let value = Array.isArray(t[key]) ? t[key].join(" | ") : t[key];
+            addLine(key + " : " + value);
+        }
+    }
+
+    if(t.htf && t.ltf){
+        doc.addPage();
+        doc.text("HTF & LTF Screenshots",20,20);
+        doc.addImage(t.htf,"JPEG",15,30,180,90);
+        doc.addImage(t.ltf,"JPEG",15,130,180,90);
+    }
+
+    doc.save("Institutional_Master_Full_Session.pdf");
+};
+
+// Hook into existing LOCK function safely
+if(typeof window.handleSaveAction === "function"){
+    const original = window.handleSaveAction;
+
+    window.handleSaveAction = function(){
+        original.apply(this, arguments);
+
+        setTimeout(()=>{
+            waitForTradeObject((lastTrade)=>{
+                if(lastTrade){
+                    buildMasterDownloadButton(lastTrade);
+                }
+            });
+        },500);
+    };
+}
+
+})();
+</script>
+
 </body>
 </html>
 </script>
+
+<!-- ===== MASTER VIEW + COMPLETE PDF INTEGRATION (UI UNCHANGED) ===== -->
+<script>
+(function(){
+
+function waitForTradeObject(callback){
+    let check = setInterval(()=>{
+        if(typeof history !== "undefined" && history.length > 0){
+            clearInterval(check);
+            callback(history[history.length-1]);
+        }
+    },300);
+}
+
+function buildMasterDownloadButton(tradeData){
+
+    if(document.getElementById("masterDownloadBtn")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "masterDownloadBtn";
+    btn.innerText = "DOWNLOAD COMPLETE MASTER SESSION PDF";
+    btn.style.marginTop = "40px";
+    btn.style.padding = "15px";
+    btn.style.fontWeight = "bold";
+    btn.style.background = "gold";
+    btn.style.color = "#000";
+    btn.style.width = "100%";
+    btn.onclick = function(){
+        generateMasterPDF(tradeData);
+    };
+
+    document.body.appendChild(btn);
+}
+
+window.generateMasterPDF = function(t){
+
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("INSTITUTIONAL MASTER SESSION REPORT",20,20);
+
+    doc.setFontSize(10);
+    let y = 35;
+
+    function addLine(text){
+        doc.text(text,20,y);
+        y+=7;
+        if(y>270){ doc.addPage(); y=20; }
+    }
+
+    addLine("Trading Control Panel");
+    addLine("----------------------");
+
+    for(let key in t){
+        if(key !== "htf" && key !== "ltf"){
+            let value = Array.isArray(t[key]) ? t[key].join(" | ") : t[key];
+            addLine(key + " : " + value);
+        }
+    }
+
+    if(t.htf && t.ltf){
+        doc.addPage();
+        doc.text("HTF & LTF Screenshots",20,20);
+        doc.addImage(t.htf,"JPEG",15,30,180,90);
+        doc.addImage(t.ltf,"JPEG",15,130,180,90);
+    }
+
+    doc.save("Institutional_Master_Full_Session.pdf");
+};
+
+// Hook into existing LOCK function safely
+if(typeof window.handleSaveAction === "function"){
+    const original = window.handleSaveAction;
+
+    window.handleSaveAction = function(){
+        original.apply(this, arguments);
+
+        setTimeout(()=>{
+            waitForTradeObject((lastTrade)=>{
+                if(lastTrade){
+                    buildMasterDownloadButton(lastTrade);
+                }
+            });
+        },500);
+    };
+}
+
+})();
+</script>
+
 </body>
 </html>
